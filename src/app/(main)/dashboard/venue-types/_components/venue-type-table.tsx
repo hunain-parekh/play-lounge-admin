@@ -9,33 +9,33 @@ import { DataTablePagination } from "@/components/data-table/data-table-paginati
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardAction } from "@/components/ui/card";
-import { useCategories, useCreateCategory, useDeleteCategory, useUpdateCategory } from "@/hooks/use-categories";
 import { useDataTableInstance } from "@/hooks/use-data-table-instance";
-import { Category } from "@/types/category";
+import { useCreateVenueType, useDeleteVenueType, useUpdateVenueType, useVenueTypes } from "@/hooks/use-venue-types";
+import { VenueType } from "@/types/venue-type";
 
-import { CategoryDialog } from "./category-dialog";
 import { createColumns } from "./columns";
 import { DeleteAlert } from "./delete-alert";
+import { VenueTypeDialog } from "./venue-type-dialog";
 
-export function CategoryTable() {
+export function VenueTypeTable() {
+  const [selectedVenueType, setSelectedVenueType] = React.useState<VenueType | null>(null);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = React.useState(false);
-  const [selectedCategory, setSelectedCategory] = React.useState<Category | null>(null);
 
-  const { data: categories = [], isLoading, dataUpdatedAt } = useCategories();
-  const createMutation = useCreateCategory();
-  const updateMutation = useUpdateCategory();
-  const deleteMutation = useDeleteCategory();
+  const { data: venueTypes = [], isLoading, dataUpdatedAt } = useVenueTypes();
+  const createMutation = useCreateVenueType();
+  const updateMutation = useUpdateVenueType();
+  const deleteMutation = useDeleteVenueType();
 
   const columns = React.useMemo(
     () =>
       createColumns({
-        onEdit: (category) => {
-          setSelectedCategory(category);
+        onEdit: (venueType) => {
+          setSelectedVenueType(venueType);
           setIsDialogOpen(true);
         },
-        onDelete: (category) => {
-          setSelectedCategory(category);
+        onDelete: (venueType) => {
+          setSelectedVenueType(venueType);
           setIsDeleteOpen(true);
         },
       }),
@@ -43,84 +43,74 @@ export function CategoryTable() {
   );
 
   const table = useDataTableInstance({
-    data: categories,
+    data: venueTypes,
     columns,
     getRowId: (row) => row.id,
   });
-
-  const handleCreate = () => {
-    setSelectedCategory(null);
-    setIsDialogOpen(true);
-  };
-
-  const handleDelete = () => {
-    if (selectedCategory) {
-      deleteMutation.mutate(selectedCategory.id);
-    }
-  };
-
-  // Effect to handle delete alert close on mutation success
-  React.useEffect(() => {
-    if (deleteMutation.isSuccess) {
-      setIsDeleteOpen(false);
-      setSelectedCategory(null);
-    }
-  }, [deleteMutation.isSuccess]);
-
-  const handleSubmit = (categoryData: Category, iconFileParam?: File | null, imageFileParam?: File | null) => {
-    if (selectedCategory) {
-      // Update existing category
-      updateMutation.mutate({
-        id: selectedCategory.id,
-        data: {
-          title: categoryData.title,
-          slug: categoryData.slug,
-          isActive: categoryData.isActive,
-          icon: iconFileParam ?? undefined,
-          image: imageFileParam ?? undefined,
-        },
-      });
-    } else {
-      // Create new category - requires both files
-      if (!iconFileParam || !imageFileParam) {
-        return;
-      }
-
-      createMutation.mutate({
-        title: categoryData.title,
-        slug: categoryData.slug,
-        icon: iconFileParam,
-        image: imageFileParam,
-      });
-    }
-  };
 
   // Effect to handle dialog close on mutation success
   React.useEffect(() => {
     if (createMutation.isSuccess || updateMutation.isSuccess) {
       setIsDialogOpen(false);
-      setSelectedCategory(null);
+      setSelectedVenueType(null);
     }
   }, [createMutation.isSuccess, updateMutation.isSuccess]);
+
+  // Effect to handle delete alert close on mutation success
+  React.useEffect(() => {
+    if (deleteMutation.isSuccess) {
+      setIsDeleteOpen(false);
+      setSelectedVenueType(null);
+    }
+  }, [deleteMutation.isSuccess]);
+
+  const handleCreate = () => {
+    setSelectedVenueType(null);
+    setIsDialogOpen(true);
+  };
+
+  const handleDelete = () => {
+    if (selectedVenueType) {
+      deleteMutation.mutate(selectedVenueType.id);
+    }
+  };
+
+  const handleSubmit = (venueTypeData: VenueType) => {
+    if (selectedVenueType) {
+      // Update existing venue type
+      updateMutation.mutate({
+        id: selectedVenueType.id,
+        data: {
+          name: venueTypeData.name,
+          isActive: venueTypeData.isActive,
+        },
+      });
+    } else {
+      // Create new venue type
+      createMutation.mutate({
+        name: venueTypeData.name,
+      });
+    }
+  };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Categories</CardTitle>
-        <CardDescription>Manage your venue categories and their details.</CardDescription>
+        <CardTitle>Venue Types</CardTitle>
+        <CardDescription>Manage the types of venues available in the platform.</CardDescription>
         <CardAction>
           <div className="flex items-center gap-2">
             <DataTableViewOptions table={table} />
             <Button variant="outline" size="sm" onClick={handleCreate}>
               <Plus />
-              <span className="hidden lg:inline">Add Category</span>
+              <span className="hidden lg:inline">Add Venue Type</span>
             </Button>
           </div>
         </CardAction>
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <div className="flex items-center justify-center py-8">Loading categories...</div>
+          <div className="flex items-center justify-center py-8">Loading venue types...</div>
         ) : (
           <div className="space-y-4" key={dataUpdatedAt}>
             <div className="overflow-hidden rounded-md border">
@@ -131,17 +121,17 @@ export function CategoryTable() {
         )}
       </CardContent>
 
-      <CategoryDialog
+      <VenueTypeDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        category={selectedCategory}
+        venueType={selectedVenueType}
         onSubmit={handleSubmit}
       />
 
       <DeleteAlert
         open={isDeleteOpen}
         onOpenChange={setIsDeleteOpen}
-        category={selectedCategory}
+        venueType={selectedVenueType}
         onConfirm={handleDelete}
       />
     </Card>

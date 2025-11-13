@@ -25,7 +25,7 @@ export function AccountSwitcher({ session }: { session?: Session | null }) {
         name: session.user.name ?? "User",
         email: session.user.email ?? "",
         avatar: "",
-        role: (session.user as any).role ?? "Super Admin",
+        role: session.user.role ?? "Super Admin",
       }
     : null;
 

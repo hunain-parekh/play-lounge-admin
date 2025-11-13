@@ -1,5 +1,9 @@
 "use client";
+
+import * as React from "react";
+
 import { ColumnDef } from "@tanstack/react-table";
+import { format } from "date-fns";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -11,14 +15,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Category } from "@/types/category";
+import { VenueType } from "@/types/venue-type";
 
 interface ColumnsProps {
-  onEdit: (category: Category) => void;
-  onDelete: (category: Category) => void;
+  onEdit: (venueType: VenueType) => void;
+  onDelete: (venueType: VenueType) => void;
 }
 
-export const createColumns = ({ onEdit, onDelete }: ColumnsProps): ColumnDef<Category>[] => [
+export const createColumns = ({ onEdit, onDelete }: ColumnsProps): ColumnDef<VenueType>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -39,52 +43,9 @@ export const createColumns = ({ onEdit, onDelete }: ColumnsProps): ColumnDef<Cat
     enableHiding: false,
   },
   {
-    accessorKey: "icon",
-    header: "Icon",
-    cell: ({ row }) => {
-      const imageUrl = row.original.icon;
-      if (!imageUrl) return <span className="text-muted-foreground text-sm">No image</span>;
-
-      return (
-        <div className="relative size-12 overflow-hidden rounded-md border">
-          <img
-            src={process.env.NEXT_PUBLIC_API_URL + imageUrl}
-            alt={row.original.title}
-            className="size-full object-cover"
-          />
-        </div>
-      );
-    },
-    enableSorting: false,
-  },
-  {
-    accessorKey: "title",
-    header: "Title",
-    cell: ({ row }) => <div className="font-medium">{row.original.title}</div>,
-  },
-  {
-    accessorKey: "slug",
-    header: "Slug",
-    cell: ({ row }) => <span className="text-muted-foreground font-mono text-sm">{row.original.slug}</span>,
-  },
-  {
-    accessorKey: "image",
-    header: "Image",
-    cell: ({ row }) => {
-      const imageUrl = row.original.image;
-      if (!imageUrl) return <span className="text-muted-foreground text-sm">No image</span>;
-
-      return (
-        <div className="relative size-12 overflow-hidden rounded-md border">
-          <img
-            src={process.env.NEXT_PUBLIC_API_URL + imageUrl}
-            alt={row.original.title}
-            className="size-full object-cover"
-          />
-        </div>
-      );
-    },
-    enableSorting: false,
+    accessorKey: "name",
+    header: "Name",
+    cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
   },
   {
     accessorKey: "isActive",
@@ -95,9 +56,17 @@ export const createColumns = ({ onEdit, onDelete }: ColumnsProps): ColumnDef<Cat
     },
   },
   {
+    accessorKey: "createdAt",
+    header: "Created",
+    cell: ({ row }) => {
+      const date = row.original.createdAt ? new Date(row.original.createdAt) : null;
+      return <span className="text-muted-foreground text-sm">{date ? format(date, "PPP") : "--"}</span>;
+    },
+  },
+  {
     id: "actions",
     cell: ({ row }) => {
-      const category = row.original;
+      const venueType = row.original;
 
       return (
         <DropdownMenu>
@@ -108,11 +77,11 @@ export const createColumns = ({ onEdit, onDelete }: ColumnsProps): ColumnDef<Cat
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onEdit(category)}>
+            <DropdownMenuItem onClick={() => onEdit(venueType)}>
               <Pencil className="mr-2 size-4" />
               Edit
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onDelete(category)} className="text-destructive focus:text-destructive">
+            <DropdownMenuItem onClick={() => onDelete(venueType)} className="text-destructive focus:text-destructive">
               <Trash2 className="mr-2 size-4" />
               Delete
             </DropdownMenuItem>

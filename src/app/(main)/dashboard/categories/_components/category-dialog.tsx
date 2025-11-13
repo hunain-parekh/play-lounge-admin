@@ -17,53 +17,79 @@ import {
 } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { Category } from "@/types/category";
 
-import { IconPicker } from "./icon-picker";
 import { categoryFormSchema, type CategoryFormValues } from "./schema";
 
 interface CategoryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   category?: Category | null;
-  onSubmit: (data: Category) => void;
+  onSubmit: (data: Category, iconFile?: File | null, imageFile?: File | null) => void;
 }
 
 export function CategoryDialog({ open, onOpenChange, category, onSubmit }: CategoryDialogProps) {
   const [imagePreview, setImagePreview] = React.useState<string>("");
+  const [iconPreview, setIconPreview] = React.useState<string>("");
+  const [iconFileState, setIconFileState] = React.useState<File | null>(null);
+  const [imageFileState, setImageFileState] = React.useState<File | null>(null);
 
   const form = useForm<CategoryFormValues>({
     resolver: zodResolver(categoryFormSchema),
     defaultValues: {
-      name: "",
+      title: "",
       icon: undefined,
       image: undefined,
+      isActive: true,
     },
   });
 
-  const watchedName = form.watch("name");
+  const watchedTitle = form.watch("title");
 
   React.useEffect(() => {
     if (category) {
+      const iconValue = category.icon ?? "";
+      const imageValue = category.image ?? "";
+
       form.reset({
-        name: category.name,
-        icon: category.icon,
-        image: category.image,
+        title: category.title,
+        icon: iconValue,
+        image: imageValue,
+        isActive: category.isActive ?? true,
       });
-      setImagePreview(category.image ?? "");
+
+      // For existing categories, set preview from backend URL
+      if (imageValue) {
+        const imageUrl = imageValue.startsWith("http") ? imageValue : `${process.env.NEXT_PUBLIC_API_URL}${imageValue}`;
+        setImagePreview(imageUrl);
+      }
+
+      if (iconValue) {
+        const iconUrl =
+          iconValue.startsWith("http") || iconValue.startsWith("data:image/")
+            ? iconValue
+            : `${process.env.NEXT_PUBLIC_API_URL}${iconValue}`;
+        setIconPreview(iconUrl);
+      }
     } else {
       form.reset({
-        name: "",
+        title: "",
         icon: undefined,
         image: undefined,
+        isActive: true,
       });
       setImagePreview("");
+      setIconPreview("");
+      setIconFileState(null);
+      setImageFileState(null);
     }
   }, [category, form, open]);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      setImageFileState(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
@@ -72,28 +98,49 @@ export function CategoryDialog({ open, onOpenChange, category, onSubmit }: Categ
     }
   };
 
+  const handleIconChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (!["image/svg+xml", "image/png"].includes(file.type)) {
+        toast.error("Only SVG or PNG icons are supported.");
+        return;
+      }
+      setIconFileState(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setIconPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setIconPreview("");
+      setIconFileState(null);
+    }
+  };
+
+  // eslint-disable-next-line complexity
   const onFormSubmit = (data: CategoryFormValues) => {
-    // Generate slug from name
-    const slug = data.name.toLowerCase().replace(/\s+/g, "-");
+    // Generate slug from title
+    const slug = data.title.toLowerCase().replace(/\s+/g, "-");
 
     // Generate unique ID for new categories
     const id = category?.id ?? `cat-${Date.now()}`;
 
     // Prepare image (use preview if new file, otherwise existing)
     const imageUrl = imagePreview || (category?.image ?? "");
+    const iconValue =
+      data.icon instanceof File ? iconPreview : typeof data.icon === "string" ? data.icon : (category?.icon ?? "");
 
     const categoryData: Category = {
       id,
-      name: data.name,
+      title: data.title,
       slug,
       image: imageUrl,
-      icon: data.icon,
+      icon: iconValue,
+      isActive: data.isActive,
       createdAt: category?.createdAt ?? new Date().toISOString(),
     };
 
-    onSubmit(categoryData);
-    toast.success(category ? "Category updated successfully" : "Category created successfully");
-    onOpenChange(false);
+    onSubmit(categoryData, iconFileState, imageFileState);
   };
 
   return (
@@ -109,12 +156,12 @@ export function CategoryDialog({ open, onOpenChange, category, onSubmit }: Categ
           <form onSubmit={form.handleSubmit(onFormSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="name"
+              name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category Name</FormLabel>
+                  <FormLabel>Category Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter category name" {...field} />
+                    <Input placeholder="Enter category title" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -126,9 +173,24 @@ export function CategoryDialog({ open, onOpenChange, category, onSubmit }: Categ
               name="icon"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Icon</FormLabel>
+                  <FormLabel>Icon (SVG or PNG)</FormLabel>
                   <FormControl>
-                    <IconPicker value={field.value} onChange={(value) => field.onChange(value)} />
+                    <div className="space-y-2">
+                      <Input
+                        type="file"
+                        accept=".svg,.png"
+                        onChange={(event) => {
+                          handleIconChange(event);
+                          field.onChange(event.target.files?.[0] ?? undefined);
+                        }}
+                        className="cursor-pointer"
+                      />
+                      {iconPreview && (
+                        <div className="bg-muted/40 relative flex size-16 items-center justify-center overflow-hidden rounded-md border p-3">
+                          <img src={iconPreview} alt="Icon preview" className="max-h-full max-w-full object-contain" />
+                        </div>
+                      )}
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -164,10 +226,26 @@ export function CategoryDialog({ open, onOpenChange, category, onSubmit }: Categ
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="isActive"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                  <div className="space-y-0.5">
+                    <FormLabel>Active Status</FormLabel>
+                    <div className="text-muted-foreground text-sm">Enable or disable this category</div>
+                  </div>
+                  <FormControl>
+                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
             <FormItem>
               <FormLabel>Slug (Auto-generated)</FormLabel>
               <Input
-                value={watchedName ? watchedName.toLowerCase().replace(/\s+/g, "-") : ""}
+                value={watchedTitle ? watchedTitle.toLowerCase().replace(/\s+/g, "-") : ""}
                 disabled
                 className="bg-muted"
               />

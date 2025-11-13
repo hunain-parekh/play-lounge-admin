@@ -12,24 +12,24 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Category } from "@/types/category";
+import { VenueType } from "@/types/venue-type";
 
 interface DeleteAlertProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  category: Category | null;
+  venueType: VenueType | null;
   onConfirm: () => void;
 }
 
-export function DeleteAlert({ open, onOpenChange, category, onConfirm }: DeleteAlertProps) {
+export function DeleteAlert({ open, onOpenChange, venueType, onConfirm }: DeleteAlertProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+          <AlertDialogTitle>Delete venue type?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the category{" "}
-            <span className="text-foreground font-semibold">&quot;{category?.title}&quot;</span>.
+            This action cannot be undone. This will permanently delete the venue type
+            <span className="text-foreground font-semibold">&quot;{venueType?.name}&quot;</span>.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

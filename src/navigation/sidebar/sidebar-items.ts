@@ -47,45 +47,45 @@ export const sidebarItems: NavGroup[] = [
         url: "/dashboard/default",
         icon: LayoutDashboard,
       },
-      {
-        title: "CRM",
-        url: "/dashboard/crm",
-        icon: ChartBar,
-      },
-      {
-        title: "Finance",
-        url: "/dashboard/finance",
-        icon: Banknote,
-      },
-      {
-        title: "Analytics",
-        url: "/dashboard/coming-soon",
-        icon: Gauge,
-        comingSoon: true,
-      },
-      {
-        title: "E-commerce",
-        url: "/dashboard/coming-soon",
-        icon: ShoppingBag,
-        comingSoon: true,
-      },
-      {
-        title: "Academy",
-        url: "/dashboard/coming-soon",
-        icon: GraduationCap,
-        comingSoon: true,
-      },
-      {
-        title: "Logistics",
-        url: "/dashboard/coming-soon",
-        icon: Forklift,
-        comingSoon: true,
-      },
+      // {
+      //   title: "CRM",
+      //   url: "/dashboard/crm",
+      //   icon: ChartBar,
+      // },
+      // {
+      //   title: "Finance",
+      //   url: "/dashboard/finance",
+      //   icon: Banknote,
+      // },
+      // {
+      //   title: "Analytics",
+      //   url: "/dashboard/coming-soon",
+      //   icon: Gauge,
+      //   comingSoon: true,
+      // },
+      // {
+      //   title: "E-commerce",
+      //   url: "/dashboard/coming-soon",
+      //   icon: ShoppingBag,
+      //   comingSoon: true,
+      // },
+      // {
+      //   title: "Academy",
+      //   url: "/dashboard/coming-soon",
+      //   icon: GraduationCap,
+      //   comingSoon: true,
+      // },
+      // {
+      //   title: "Logistics",
+      //   url: "/dashboard/coming-soon",
+      //   icon: Forklift,
+      //   comingSoon: true,
+      // },
     ],
   },
   {
     id: 2,
-    label: "Pages",
+    label: "Setup",
     items: [
       // {
       //   title: "Email",
@@ -134,6 +134,11 @@ export const sidebarItems: NavGroup[] = [
         url: "/dashboard/categories",
         icon: Tag,
       },
+      {
+        title: "Venue Types",
+        url: "/dashboard/venue-types",
+        icon: Tag,
+      },
       // {
       //   title: "Authentication",
       //   url: "/auth",
@@ -147,16 +152,16 @@ export const sidebarItems: NavGroup[] = [
       // },
     ],
   },
-  {
-    id: 3,
-    label: "Misc",
-    items: [
-      {
-        title: "Others",
-        url: "/dashboard/coming-soon",
-        icon: SquareArrowUpRight,
-        comingSoon: true,
-      },
-    ],
-  },
+  // {
+  //   id: 3,
+  //   label: "Misc",
+  //   items: [
+  //     {
+  //       title: "Others",
+  //       url: "/dashboard/coming-soon",
+  //       icon: SquareArrowUpRight,
+  //       comingSoon: true,
+  //     },
+  //   ],
+  // },
 ];
