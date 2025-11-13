@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import { toast } from "sonner";
 
 import {
@@ -33,8 +34,8 @@ export const useCreateVenueType = () => {
       queryClient.invalidateQueries({ queryKey: VENUE_TYPES_QUERY_KEY });
       toast.success("Venue type created successfully");
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message ?? "Failed to create venue type");
+    onError: (error: AxiosError<{ message?: string }>) => {
+      toast.error(error.response?.data?.message ?? "Failed to create venue type");
     },
   });
 };
@@ -50,8 +51,8 @@ export const useUpdateVenueType = () => {
       queryClient.invalidateQueries({ queryKey: VENUE_TYPES_QUERY_KEY });
       toast.success("Venue type updated successfully");
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message ?? "Failed to update venue type");
+    onError: (error: AxiosError<{ message?: string }>) => {
+      toast.error(error.response?.data?.message ?? "Failed to update venue type");
     },
   });
 };
@@ -67,8 +68,8 @@ export const useDeleteVenueType = () => {
       queryClient.invalidateQueries({ queryKey: VENUE_TYPES_QUERY_KEY });
       toast.success("Venue type deleted successfully");
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message ?? "Failed to delete venue type");
+    onError: (error: AxiosError<{ message?: string }>) => {
+      toast.error(error.response?.data?.message ?? "Failed to delete venue type");
     },
   });
 };

@@ -1,16 +1,4 @@
-import {
-  ShoppingBag,
-  Forklift,
-  Users,
-  LayoutDashboard,
-  ChartBar,
-  Banknote,
-  Gauge,
-  GraduationCap,
-  Tag,
-  SquareArrowUpRight,
-  type LucideIcon,
-} from "lucide-react";
+import { LayoutDashboard, Tag, Users, type LucideIcon } from "lucide-react";
 
 export interface NavSubItem {
   title: string;

@@ -1,4 +1,6 @@
 "use client";
+import Image from "next/image";
+
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
@@ -47,10 +49,12 @@ export const createColumns = ({ onEdit, onDelete }: ColumnsProps): ColumnDef<Cat
 
       return (
         <div className="relative size-12 overflow-hidden rounded-md border">
-          <img
+          <Image
             src={process.env.NEXT_PUBLIC_API_URL + imageUrl}
             alt={row.original.title}
-            className="size-full object-cover"
+            fill
+            className="object-cover"
+            unoptimized
           />
         </div>
       );
@@ -76,10 +80,12 @@ export const createColumns = ({ onEdit, onDelete }: ColumnsProps): ColumnDef<Cat
 
       return (
         <div className="relative size-12 overflow-hidden rounded-md border">
-          <img
+          <Image
             src={process.env.NEXT_PUBLIC_API_URL + imageUrl}
             alt={row.original.title}
-            className="size-full object-cover"
+            fill
+            className="object-cover"
+            unoptimized
           />
         </div>
       );

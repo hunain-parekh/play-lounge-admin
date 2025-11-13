@@ -2,6 +2,8 @@
 
 import * as React from "react";
 
+import Image from "next/image";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -186,8 +188,8 @@ export function CategoryDialog({ open, onOpenChange, category, onSubmit }: Categ
                         className="cursor-pointer"
                       />
                       {iconPreview && (
-                        <div className="bg-muted/40 relative flex size-16 items-center justify-center overflow-hidden rounded-md border p-3">
-                          <img src={iconPreview} alt="Icon preview" className="max-h-full max-w-full object-contain" />
+                        <div className="bg-muted/40 relative size-16 overflow-hidden rounded-md border">
+                          <Image src={iconPreview} alt="Icon preview" fill className="object-contain p-3" unoptimized />
                         </div>
                       )}
                     </div>
@@ -216,7 +218,7 @@ export function CategoryDialog({ open, onOpenChange, category, onSubmit }: Categ
                       />
                       {imagePreview && (
                         <div className="relative size-32 overflow-hidden rounded-md border">
-                          <img src={imagePreview} alt="Preview" className="size-full object-cover" />
+                          <Image src={imagePreview} alt="Preview" fill className="object-cover" unoptimized />
                         </div>
                       )}
                     </div>
